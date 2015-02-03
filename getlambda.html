@@ -1,0 +1,46 @@
+<html>
+<head>
+<script src="https://github.com/aws/aws-sdk-js/blob/master/dist/aws-sdk.min.js"></script>
+<script>
+var getVar1 = getUrlVars()["id"];
+var getVar2 = getUrlVars()["page"]
+var lambdaArgs = {id:[getVar1], page:getVar2};
+var LAMBDAFUNCTIONNAME = "My-Good-Old-Function";
+var ACCESSKEYID = "My-ACCESS-Key-ID";
+var SECRETACCESSKEY = "My-SECRET-ACCESS-KEY";
+var MYREGION = "us-east-1";
+
+function LambdaClient(options){
+    this.options = options || {};
+    this.lambdaClient = new AWS.Lambda(options);
+
+    this.invoke = function(functionName, invokeArgs){
+      var callId = functionName;
+
+      var params = {
+        FunctionName: functionName,
+        InvokeArgs: JSON.stringify({"args": invokeArgs})
+      }
+      console.log(invokeArgs);
+      this.lambdaClient.invokeAsync(params, function(err, data) {
+            if (err) { throw 'Erro: '+err } else { console.log(data);}
+      });
+    }
+}
+  
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
+
+AWS.config.update({accessKeyId: ACCESSKEYID, secretAccessKey: SECRETACCESSKEY, region: MYREGION});
+
+var lambdaJob = new LambdaClient();
+lambdaJob.invoke(LAMBDAFUNCTIONNAME, lambdaArgs);
+
+</script>
+</head>
+</html>
